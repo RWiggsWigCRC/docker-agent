@@ -9,6 +9,7 @@ docker
 prometheus_client
 chardet
 dateparser
+supervisor
 func_timeout
 distro
 pycrypto

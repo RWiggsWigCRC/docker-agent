@@ -9,8 +9,10 @@ RUN apt-get update && \
   apt-get install -y wget && \
   apt-get install -y vim && \
   apt-get install -y libssl-dev && \
-  apt-get install -y supervisor && \
-  rm -rf /var/lib/apt/lists/*
+  apt-get install -y python3-pip && \
+  rm -rf /var/lib/apt/lists/* &&  \
+  pip3 install futures && \
+  pip3 install supervisor
 
 COPY ["s247_setup.sh", "entrypoint.sh", "heartbeat.sh", "requirements.txt", "singleinstance.py", "./"]
 
@@ -23,4 +25,4 @@ HEALTHCHECK --interval=10s --timeout=3s --retries=1 \
 
 ENTRYPOINT ["/opt/entrypoint.sh"]
 
-CMD ["supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
+CMD ["supervisord", "-s", "-n", "-c", "/etc/supervisor/supervisor.conf"]

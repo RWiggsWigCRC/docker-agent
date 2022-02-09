@@ -77,8 +77,8 @@ variableUpdate(){
 	MON_AGENT_GROUP=$PRODUCT_NAME_LOWERCASE'-group'
 	MON_AGENT_USER=$PRODUCT_NAME_LOWERCASE'-agent'
 	MON_AGENT_SUPERVISOR_CONF_FILE=$MON_AGENT_CONF_DIR/supervisor.conf
-	SUPERVISOR_CONFD_DIR=/etc/supervisor/conf.d
-	SUPERVISOR_CONFD_FILE=$SUPERVISOR_CONFD_DIR/site24x7-agent.conf
+	SUPERVISOR_CONFD_DIR=/etc/supervisor/
+	SUPERVISOR_CONFD_FILE=$SUPERVISOR_CONFD_DIR/supervisor.conf
         ALPINE_SUPERVISOR_CONFD_FILE=/etc/supervisor.d/site24x7-agent.ini
 }
 
@@ -130,18 +130,26 @@ getEnvValues(){
 }
 
 constructInstallationParam(){
+
 	wget https://staticdownloads.site24x7.com/server/Site24x7MonitoringAgent.install
         if [ ! -d $MON_AGENT_HOME ]; then
 		bash Site24x7MonitoringAgent.install -i -key="$KEY_VALUE" -proxy="$PROXY_VALUE" -dn="$DN_VALUE" -gn="$GN_VALUE" -ct="$CT_VALUE" -tp="$TP_VALUE" -np="$NP_VALUE" -rp="$RP_VALUE" -installer="$INSTALLER_VALUE" -gn="$GROUP_VALUE" -tags="$TAGS_VALUE" -da -psw 
 	fi
+
+        echo "[supervisord]" >> $MON_AGENT_SUPERVISOR_CONF_FILE
+
+        if [ ! -d $SUPERVISOR_CONFD_DIR ]; then
+            mkdir -pv $SUPERVISOR_CONFD_DIR
+        fi
+
         if [ -d $SUPERVISOR_CONFD_DIR ]; then
 	    if [ ! -f $SUPERVISOR_CONFD_FILE ]; then
-		cp $MON_AGENT_SUPERVISOR_CONF_FILE $SUPERVISOR_CONFD_FILE
+		cp -v $MON_AGENT_SUPERVISOR_CONF_FILE $SUPERVISOR_CONFD_FILE
 	    fi
         else
             if [ ! -f $ALPINE_SUPERVISOR_CONFD_FILE ]; then
-                mkdir /etc/supervisor.d 2>/dev/null
-                cp $MON_AGENT_SUPERVISOR_CONF_FILE $ALPINE_SUPERVISOR_CONFD_FILE
+                mkdir -pv /etc/supervisor.d 2>/dev/null
+                cp -v $MON_AGENT_SUPERVISOR_CONF_FILE $ALPINE_SUPERVISOR_CONFD_FILE
             fi
         fi
 }
